@@ -93,7 +93,7 @@ function setup(){
 	blueCircle = loadImage("../asset/blueCircle.png");
 	blueCircleIcon = loadImage("../asset/smallCircle.png");
 	conditionImage = loadImage("../asset/orangeRect.png");
-	../assets = {"result":blueCircle,"resultIcon":blueCircleIcon,"condition":conditionImage};
+	assets = {"result":blueCircle,"resultIcon":blueCircleIcon,"condition":conditionImage};
 	resultImages = [loadImage("../asset/resultbg0.png"),loadImage("../asset/resultbg1.png"),loadImage("../asset/resultbg2.png"),loadImage("../asset/resultbg3.png"),loadImage("../asset/resultbg4.png"),loadImage("../asset/resultbg5.png"),loadImage("../asset/resultbg6.png"),loadImage("../asset/resultbg7.png"),loadImage("../asset/resultbg8.png"),loadImage("../asset/resultbg9.png"),loadImage("../asset/resultbg10.png")];
 	
 
