@@ -101,7 +101,8 @@ function setup(){
 
 	canvasWidth = document.documentElement.clientWidth;
 	canvasHeight = document.documentElement.clientHeight;
-	createCanvas(canvasWidth,canvasHeight);
+	let canvas = createCanvas(canvasWidth,canvasHeight);
+	canvas.parent("canvas");
 	textAlign(CENTER, CENTER);
 
 	
