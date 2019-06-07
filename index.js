@@ -17,8 +17,6 @@ let conditions = [
 	{id:5,title:"直角があるか"},{id:6,title:"2組の平行な辺があるか"}
 ];
 
-var input;
-
 let resultAndCondition = [
 	[false,false,false,false,false,false,false],//0
 	[false,true,true,true,false,false,false],//1
@@ -53,16 +51,58 @@ var isAvailableRightRect = false;
 var resultImages;
 var hoverHanteiButton = false;
 
+var projectId;
+
+
+firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      // User is signed in.
+      var displayName = user.displayName;
+      var email = user.email;
+      var emailVerified = user.emailVerified;
+      var photoURL = user.photoURL;
+      var isAnonymous = user.isAnonymous;
+      var uid = user.uid;
+      var providerData = user.providerData;
+      // ...
+      
+    } else {
+      // User is signed out.
+      // ...
+      window.location.href = '../login.html';
+    }
+  });
+
+  function getParam(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
 // init
 function setup(){
 
+	projectId = getParam("id");
+	if(!projectId || projectId == "")
+	{
+		//プロジェクトidが無い場合
+		return
+	}
 
-	input = createInput();
-	input.position(100, document.documentElement.clientHeight - 50);
+	firebase.database().ref("projects/"+projectId).once("value")
+        .then(function(snapshot) {
+		   console.log(JSON.parse(snapshot.child("code").val()));
+		   
+        });
 
 	canvasWidth = document.documentElement.clientWidth;
 	canvasHeight = document.documentElement.clientHeight;
-	createCanvas(canvasWidth,canvasHeight);
+	let canvas = createCanvas(canvasWidth,canvasHeight);
+	canvas.parent("canvas");
 	textAlign(CENTER, CENTER);
 
 	
@@ -102,10 +142,6 @@ function setup(){
 // drawing graphics
 function draw(){
 	clear();
-
-	fill(0);
-	textSize(18);
-	text("名前:", 50,document.documentElement.clientHeight - 50)
 
 	drawClassifySeparate();
 	data.forEach(function(obj){showObject(obj)});
@@ -272,13 +308,6 @@ function mousePressed(){
 function hantei(){
 	if(judgement == null)
 	{
-		
-
-		if(!input || input.value() == null  || input.value() == "")
-		{
-			alert('名前を入力してください');
-			return
-		}
 
 		let outputData = $.extend([], data);
 
@@ -322,22 +351,14 @@ function hantei(){
 			judgement = false;
 		}
 
-		
-
-		defaultDatabase.collection("venn_diagram_answers").add({
-			name:input.value(),
+		var kegakiDataRef = firebase.database().ref("projects/"+projectId+"/kegaki").push();
+		kegakiDataRef.set({
+			user:firebase.auth().currentUser.uid,
 			json:JSON.stringify(simpleStruct),
 			hantei:judgement
-		})
-		.then(function(docRef) {
-			console.log("Document written with ID: ", docRef.id);
-			document.getElementById("defaultCanvas0").toBlob(function(blob){
-				defaultStorage.ref().child("venn_diagram_answers/" + docRef.id + ".png").put(blob);
-			});
-			
-		})
-		.catch(function(error) {
-			console.error("Error adding document: ", error);
+		});
+		document.getElementById("defaultCanvas0").toBlob(function(blob){
+			firebase.storage().ref().child("kegaki/" + projectId + "/"+ kegakiDataRef.key + ".png").put(blob);
 		});
 	}
 }
