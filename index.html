@@ -6,6 +6,7 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
 	  integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+	<link rel="stylesheet" href="index.css">
   <title>Kegaki - ベン図分類システム</title>
 	<script   src="https://code.jquery.com/jquery-3.3.1.min.js"   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="   crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.js"></script>
@@ -58,6 +59,40 @@
 		<div id="container-ext">
 			<div id="canvas">
 				
+			</div>
+			<div id="leftSidePanel">
+				<div class="leftSideInnerPanel">
+					<ul id="leftSidePanelList">
+						<!--ここにボタンが入る-->
+					</ul>
+				</div>
+				<div id="selectorContainer">
+					<div class="selectorButton writingmode selectorButton-selected" onclick="showLeftSideMenu(0);">
+						<img src="asset/dia.png" class="selectorButtonImage">
+						Condition
+					</div>
+					<div class="selectorButton writingmode"　 onclick="showLeftSideMenu(1);">
+						<img src="asset/shape.png" class="selectorButtonImage">
+						Shape
+					</div>
+				</div>
+				
+			
+			
+			</div>
+
+			<div id="validateButtonContainer">
+					<div id="validateButtonRope"></div>
+					<img id="startButton" src="asset/start.png" onclick="validate();">
+					<img id="validateResult" class="hidden" src="asset/succeeded.png" onclick="unValidated();">
+			</div>
+
+			</div>
+
+			<div id="loading" class="hidden">
+				<div id="loadingSpinner" class="spinner-border" role="status">
+					<span class="sr-only">Loading...</span>
+				  </div>
 			</div>
 		</div>
 	</div>

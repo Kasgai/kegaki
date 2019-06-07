@@ -2,34 +2,133 @@
 
 let data = [];
 
+let conditions = [
+	{id:0,text:"1組の平行な辺があるか"},
+	{id:1,text: "頂点は三つか"},
+	{id:2,text:"3辺の長さは等しいか"},
+	{id:3,text:"2辺の長さが等しいか"},
+	{id:4,text:"4辺の長さが等しいか"},
+	{id:5,text:"直角があるか"},
+	{id:6,text:"2組の平行な辺があるか"}
+];
+
+let targets = [
+	{id:0,name: "四角形",
+		condition:{
+			0: false,
+			1: false,
+			2: false,
+			3: false,
+			4: false,
+			5: false,
+			6: false
+		}},
+	{id:1,name: "正三角形",
+		condition: {
+			0: false,
+			1: true,
+			2: true,
+			3: true,
+			4: false,
+			5: false,
+			6: false
+	}},
+	{id:2,name: "直角二等辺三角形",
+		condition: {
+			0: false,
+			1: true,
+			2: false,
+			3: true,
+			4: false,
+			5: true,
+			6: false
+		}},
+	{id:3,name: "二等辺三角形",
+		condition: {
+			0: false,
+			1: true,
+			2: false,
+			3: true,
+			4: false,
+			5: false,
+			6: false
+		}},
+	{id:4,name: "直角三角形",
+		condition: {
+			0: false,
+			1: true,
+			2: false,
+			3: false,
+			4: false,
+			5: true,
+			6: false
+		}},
+	{id:5,name: "三角形",
+		condition: {
+			0: false,
+			1: true,
+			2: false,
+			3: false,
+			4: false,
+			5: false,
+			6: false
+		}},
+	{id:6,name: "正方形",
+		condition: {
+			0: true,
+			1: false,
+			2: true,
+			3: true,
+			4: true,
+			5: true,
+			6: true
+		}},
+	{id:7,name: "ひし形",
+		condition: {
+			0: true,
+			1: false,
+			2: true,
+			3: true,
+			4: true,
+			5: false,
+			6: true
+		}},
+	{id:8,name: "長方形",
+		condition: {
+			0: true,
+			1: false,
+			2: false,
+			3: true,
+			4: false,
+			5: true,
+			6: true
+		}},
+	{id:9,name: "平行四辺形",
+		condition: {
+			0: true,
+			1: false,
+			2: false,
+			3: true,
+			4: false,
+			5: false,
+			6: true
+		}},
+	{id:10,name: "台形",
+		condition: {
+			0: true,
+			1: false,
+			2: false,
+			3: false,
+			4: false,
+			5: false,
+			6: false
+		}}
+];
+
 let template = {
 	"result":{w:50,h:50, type:"result", active:false},
 	"condition":{w:150,h:50,type:"condition",active:false}
 };
-
-let results = [
-	{id:0,title: "四角形"},{id:1, title: "正三角形"},{id:3,title: "二等辺三角形"},{id:4,title: "直角三角形"},{id:5,title: "三角形"},
-	{id:6,title: "正方形"},{id:7,title: "ひし形"},{id:2,title: "直角二等辺三角形"},{id:8,title: "長方形"},{id:9,title: "平行四辺形"},{id:10,title: "台形"}
-];
-
-let conditions = [
-	{id:0,title:"1組の平行な辺があるか"},{id:1,title: "頂点は三つか"},{id:2 ,title:"3辺の長さは等しいか"},{id:3,title:"2辺の長さが等しいか"},{id:4,title:"4辺の長さが等しいか"},
-	{id:5,title:"直角があるか"},{id:6,title:"2組の平行な辺があるか"}
-];
-
-let resultAndCondition = [
-	[false,false,false,false,false,false,false],//0
-	[false,true,true,true,false,false,false],//1
-	[false,true,false,true,false,true,false],//2
-	[false,true,false,true,false,false,false],//3
-	[false,true,false,false,false,true,false],//4
-	[false,true,false,false,false,false,false],//5
-	[true,false,true,true,true,true,true],//6
-	[true,false,true,true,true,false,true],//7ひしがた
-	[true,false,false,true,false,true,true],//8
-	[true,false,false,true,false,false,true],//9平行四辺形
-	[true,false,false,false,false,false,false]//10台形
-];
 
 var blueCircleIcon;
 var blueCircle;
@@ -39,7 +138,6 @@ var assets;
 let canvasWidth;
 let canvasHeight;
 
-var hanteiButtonRect;
 var judgement = null;
 
 var rectRef;
@@ -52,6 +150,8 @@ var resultImages;
 var hoverHanteiButton = false;
 
 var projectId;
+
+var selectedSidePanelTab;
 
 
 firebase.auth().onAuthStateChanged(function(user) {
@@ -83,6 +183,27 @@ firebase.auth().onAuthStateChanged(function(user) {
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
+function showLeftSideMenu(selected) {
+	$("#leftSidePanelList").empty();
+	selectedSidePanelTab = selected;
+	var data;
+	if(selectedSidePanelTab == 0)
+	{
+		$("#selectorContainer .selectorButton:first").addClass("selectorButton-selected");
+		$("#selectorContainer .selectorButton:nth-child(2)").removeClass("selectorButton-selected");
+		data = conditions;
+	}
+	else {
+		$("#selectorContainer .selectorButton:nth-child(2)").addClass("selectorButton-selected");
+		$("#selectorContainer .selectorButton:first").removeClass("selectorButton-selected");
+		data = targets;
+	}
+
+	for (var item in data) {
+		$("#leftSidePanelList").append('<li class="leftSidePanelListItem"  onmousedown=" addNewObj('+data[item].id+');">'+ (selectedSidePanelTab == 0 ? data[item].text : "<img class='targetItemImage' src='asset/"+ data[item].id +".png'>") +'</li>')
+	}
+}
+
 // init
 function setup(){
 
@@ -93,48 +214,23 @@ function setup(){
 		return
 	}
 
+	showLeftSideMenu(0);
+
 	firebase.database().ref("projects/"+projectId).once("value")
         .then(function(snapshot) {
 		   console.log(JSON.parse(snapshot.child("code").val()));
 		   
         });
 
-	canvasWidth = document.documentElement.clientWidth;
-	canvasHeight = document.documentElement.clientHeight;
+	canvasWidth = $("#container-ext").width();
+	canvasHeight = $("#container-ext").height();
 	let canvas = createCanvas(canvasWidth,canvasHeight);
 	canvas.parent("canvas");
 	textAlign(CENTER, CENTER);
 
-	
-	results.forEach(
-		function(n,index){
-			let result = jQuery.extend(true, {}, template["result"]);
-			result.title = n.title;
-			result.id = n.id;
-			result.x = 50 + index * 100;
-			result.y = 50;
-			result.defaultX = 50 + index * 100;
-			result.defaultY = 50;
-			data.push(result);
-		}
-	);
-
-	conditions.forEach(function(n,index){
-		let condition = jQuery.extend(true,{},template["condition"]);
-		condition.title = n.title;
-		condition.id = n.id;
-		condition.x = 50 + index * 175;
-		condition.y = 150;
-		condition.defaultX = 50 + index * 175;
-		condition.defaultY = 150;
-		data.push(condition);
-	});
-
-	blueCircle = loadImage("../asset/blueCircle.png");
-	blueCircleIcon = loadImage("../asset/smallCircle.png");
 	conditionImage = loadImage("../asset/orangeRect.png");
-	assets = {"result":blueCircle,"resultIcon":blueCircleIcon,"condition":conditionImage};
-	resultImages = [loadImage("../asset/resultbg0.png"),loadImage("../asset/resultbg1.png"),loadImage("../asset/resultbg2.png"),loadImage("../asset/resultbg3.png"),loadImage("../asset/resultbg4.png"),loadImage("../asset/resultbg5.png"),loadImage("../asset/resultbg6.png"),loadImage("../asset/resultbg7.png"),loadImage("../asset/resultbg8.png"),loadImage("../asset/resultbg9.png"),loadImage("../asset/resultbg10.png")];
+	assets = {"condition":conditionImage};
+	resultImages = [loadImage("asset/0.png"),loadImage("asset/1.png"),loadImage("asset/2.png"),loadImage("asset/3.png"),loadImage("asset/4.png"),loadImage("asset/5.png"),loadImage("asset/6.png"),loadImage("asset/7.png"),loadImage("asset/8.png"),loadImage("asset/9.png"),loadImage("asset/10.png")];
 	
 
 }
@@ -145,50 +241,15 @@ function draw(){
 
 	drawClassifySeparate();
 	data.forEach(function(obj){showObject(obj)});
-	drawStockRect();
-
-	if(judgement == true)
-	{
-		textSize(50);
-		fill(100,200,50);
-		text("正解", document.documentElement.clientWidth - 100, document.documentElement.clientHeight - 100);
-	}
-	else if(judgement == false)
-	{
-		fill(200,100,100);
-		textSize(50);
-		text("不正解", document.documentElement.clientWidth - 100, document.documentElement.clientHeight - 100);
-	}
 
 	
-}
-
-function drawStockRect()
-{
-	noFill();
-	stroke(50, 50, 50);
-	rect(25,25, results.length * 100 + 50, 100);
-	rect(25,135,conditions.length * 175 + 50, 75);
-	if(hoverHanteiButton)
-	{
-		fill(255);
-	}
-	else {
-		fill(255,100,100);
-	}
-	hanteiButtonRect = {x:results.length * 100 + 100,y:25,w:100,h:100};
-	rect(results.length * 100 + 100 ,25, 100 , 100);
-	fill(50);
-	textSize(30);
-	let texPosition = getRectCenter(results.length * 100 + 100 ,25, 100 , 100);
-	text("判定",texPosition.x,texPosition.y);
 }
 
 function drawClassifySeparate()
 {
 	noFill();
 
-	rectRef = {x:25,y:225, w:canvasWidth - 50, h:canvasHeight - 250};
+	rectRef = {x: $("#leftSidePanel").width() + 25,y:25, w:canvasWidth - $("#leftSidePanel").width() - 50, h:canvasHeight - 50};
 	stroke(0);
 	if(isAvailableContainer){
 		stroke(255,100,100);
@@ -298,69 +359,86 @@ function mousePressed(){
 			obj.touchPosition = getTouchPosition(obj.x,obj.y,mouseX,mouseY);
 		}
 	});
+}
 
-	if(hoverHanteiButton)
-	{
-		hantei();
+function validate() {
+
+	$("#startButton").animate({"top":-$("#startButton").height(),"opacity":0},{duration: "normal",easing: "swing"});
+	$("#validateButtonRope").animate({"top":-$("#startButton").height(),"opacity":0}, "normal","swing" ,function() {
+		if(hantei()) {
+			$("#validateResult").attr("src","asset/succeeded.png");
+		}
+		else {
+			$("#validateResult").attr("src","asset/failed.png");
+		}
+		$("#validateResult").css({"top":-$("#validateResult").height()});
+		$("#validateResult").fadeIn("normal").animate({"top":70},{duration: "normal",easing: "swing"});
+		$("#validateButtonRope").animate({"top":0,"opacity":100},{duration: "normal",easing: "swing"});
+	});
+	
+}
+
+function unValidated() {
+	$("#startButton").css({"top":70,opacity:1});
+	$("#validateResult").hide();
+}
+
+function addNewObj(id) {
+	$("#leftSidePanel").hide();
+	if(selectedSidePanelTab == 0) {
+		let n = conditions[id];
+		let condition = jQuery.extend(true,{},template["condition"]);
+		condition.title = n.text;
+		condition.id = n.id;
+		condition.x = mouseX - 20;
+		condition.y = mouseY - 20;
+		data.push(condition);
+		mousePressed();
+	}else {
+		let n = targets[id];
+		let result = jQuery.extend(true, {}, template["result"]);
+			result.title = n.name;
+			result.id = n.id;
+			result.x = mouseX - 20;
+			result.y = mouseY - 20;
+			data.push(result);
+			mousePressed();
 	}
 }
 
 function hantei(){
-	if(judgement == null)
-	{
 
 		let outputData = $.extend([], data);
 
 		let simpleStruct = getSimpleStructData(outputData);
 
-		judgement = true;
 		if(simpleStruct.condition1 && simpleStruct.condition2){
 			//bothにある全ては両方満たす
 			simpleStruct.both.forEach(function(e){
-				if(!(resultAndCondition[e.id][simpleStruct.condition1.id] && resultAndCondition[e.id][simpleStruct.condition2.id]))
-				{
-					judgement = false;
-				}
+				if(!targets.find(n => n.id == e.id).condition[simpleStruct.condition1.id] || !targets.find(n => n.id == e.id).condition[simpleStruct.condition2.id]) return false;
 			});
 			//condition1にある全てはcondition1を満たす
 			simpleStruct.condition1Elem.forEach(function(e){
-				if(!resultAndCondition[e.id][simpleStruct.condition1.id])
-				{
-					judgement = false;
-				}
+				if(!targets.find(n => n.id == e.id).condition[simpleStruct.condition1.id]) return false;
 			});
 			//condition2にある全てはcondition2を満たす
 			simpleStruct.condition2Elem.forEach(function(e){
-				if(!resultAndCondition[e.id][simpleStruct.condition2.id])
-				{
-					judgement = false;
-				}
+				if(!targets.find(n => n.id == e.id).condition[simpleStruct.condition2.id]) return false;
 			});
 			//そこに入らないもの全ては両方満たさない
-			for(var i = 0; i < resultAndCondition.length; i++)
+			for(var i = 0; i < targets.length; i++)
 			{
 				if(simpleStruct.condition2Elem.filter(x => x.id == i).length == 0 && simpleStruct.condition1Elem.filter(x => x.id == i).length == 0 && simpleStruct.both.filter(x => x.id == i).length == 0)
 				{
-					if(resultAndCondition[i][simpleStruct.condition2.id] || resultAndCondition[i][simpleStruct.condition1.id]){
-						judgement =  false;
-					} 
+					if(targets.find(n => n.id == i).condition[simpleStruct.condition2.id] || targets.find(n => n.id == i).condition[simpleStruct.condition1.id]) return false;
 				}
 			}
 
 		}else {
-			judgement = false;
+			return false;
 		}
 
-		var kegakiDataRef = firebase.database().ref("projects/"+projectId+"/kegaki").push();
-		kegakiDataRef.set({
-			user:firebase.auth().currentUser.uid,
-			json:JSON.stringify(simpleStruct),
-			hantei:judgement
-		});
-		document.getElementById("defaultCanvas0").toBlob(function(blob){
-			firebase.storage().ref().child("kegaki/" + projectId + "/"+ kegakiDataRef.key + ".png").put(blob);
-		});
-	}
+		return true;
 }
 
 function getSimpleStructData(obj)
@@ -407,16 +485,6 @@ function mouseDragged(){
 			whereAmI(mouseX,mouseY);
 		}
 	});
-	mouseMoved();
-}
-
-function mouseMoved(){
-	if(checkTouch(hanteiButtonRect.x,hanteiButtonRect.y,hanteiButtonRect.w,hanteiButtonRect.h, mouseX,mouseY)){
-		hoverHanteiButton = true;
-	}
-	else {
-		hoverHanteiButton = false;
-	}
 }
 
 function whereAmI(mousex,mousey)
@@ -451,6 +519,7 @@ function whereAmI(mousex,mousey)
 // when mouseclick is released
 function mouseReleased(){
 
+	$("#leftSidePanel").show();
 
 	data.forEach(function(obj){
 		if(obj.active)
@@ -484,9 +553,7 @@ function mouseReleased(){
 					obj.y = rectRef.y + rectRef.h / 10 * 2 - 25;
 				}
 				else {
-					obj.assign = null;
-					obj.x = obj.defaultX;
-					obj.y = obj.defaultY;
+					data = data.filter(n => n != obj);
 				}
 			}
 			else if(obj.type == "result")
@@ -508,9 +575,7 @@ function mouseReleased(){
 					obj.assign = 2;
 				}
 				else {
-					obj.x = obj.defaultX;
-					obj.y = obj.defaultY;
-					obj.assign = null;
+					data = data.filter(n => n != obj);
 				}
 
 			}
@@ -537,26 +602,4 @@ function checkTouch(x1,y1,w1,h1,mouseX,mouseY)
 function getTouchPosition(x,y,mouseX,mouseY)
 {
 	return {x:mouseX-x,y:mouseY-y};
-}
-
-function del(obj)
-{
-	if(obj.isEliminatable == false)
-	{
-		return;
-	}
-
-	 if(obj.child)
-	{
-		del(obj.child)
-	}
-	if(obj.yes)
-	{
-		del(data.filter(n=> n === obj.yes)[0])
-	}
-	if(obj.no)
-	{
-		del(data.filter(n=> n === obj.no)[0])
-	}
-	data = data.filter(n => n != obj);
 }
