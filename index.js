@@ -2,6 +2,8 @@
 
 let data = [];
 
+let startTime = new Date();
+
 let conditions = [
 	{id:0,text:"1組の平行な辺があるか"},
 	{id:1,text: "頂点は三つか"},
@@ -308,6 +310,28 @@ function drawClassifySeparate()
 
 }
 
+function saveToServer(isValidate) {
+	unValidated();
+	let stop = new Date();
+	let outputData = $.extend([], data);
+	let simpleStruct = getSimpleStructData(outputData);
+	firebase.database().ref("projects/"+projectId + "/kegaki/log").push({
+		code:JSON.stringify(simpleStruct),
+		datetime: firebase.database.ServerValue.TIMESTAMP,
+		hantei: hantei(),
+		isValidate: isValidate,
+		time: (stop.getTime() - startTime.getTime()) / 1000
+	});
+	firebase.database().ref("projects/"+projectId + "/kegaki/save").update({
+		code:JSON.stringify(simpleStruct),
+		datetime: firebase.database.ServerValue.TIMESTAMP,
+		hantei: hantei(),
+		isValidate: isValidate,
+		time: (stop.getTime() - startTime.getTime()) / 1000
+	});
+	console.log("saved");
+}
+
 function getRectCenter(x,y,w,h)
 {
 	return {x:x+(w/2),y:y+(h/2)};
@@ -362,7 +386,7 @@ function mousePressed(){
 }
 
 function validate() {
-
+	saveToServer(true);
 	$("#startButton").animate({"top":-$("#startButton").height(),"opacity":0},{duration: "normal",easing: "swing"});
 	$("#validateButtonRope").animate({"top":-$("#startButton").height(),"opacity":0}, "normal","swing" ,function() {
 		if(hantei()) {
@@ -579,7 +603,8 @@ function mouseReleased(){
 				}
 
 			}
-			judgement = null;
+			saveToServer(false);
+			unValidated();
 		}
 	});
 
@@ -603,3 +628,17 @@ function getTouchPosition(x,y,mouseX,mouseY)
 {
 	return {x:mouseX-x,y:mouseY-y};
 }
+
+$(document).ready(function(){
+	$(window).on("beforeunload",function(e){
+		let stop = new Date();
+		let outputData = $.extend([], data);
+		let simpleStruct = getSimpleStructData(outputData);
+		firebase.database().ref("projects/"+projectId + "/kegaki/sessions/").push({
+			code:JSON.stringify(simpleStruct),
+			datetime: firebase.database.ServerValue.TIMESTAMP,
+			hantei: hantei(),
+			time: (stop.getTime() - startTime.getTime()) / 1000
+		});
+	});
+  });
