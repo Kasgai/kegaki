@@ -437,32 +437,43 @@ function hantei(){
 		let simpleStruct = getSimpleStructData(outputData);
 
 		if(simpleStruct.condition1 && simpleStruct.condition2){
+			
+			var result = true;
+
 			//bothにある全ては両方満たす
 			simpleStruct.both.forEach(function(e){
-				if(!targets.find(n => n.id == e.id).condition[simpleStruct.condition1.id] || !targets.find(n => n.id == e.id).condition[simpleStruct.condition2.id]) return false;
+				if(!targets.find(n => n.id == e.id).condition[simpleStruct.condition1.id] || !targets.find(n => n.id == e.id).condition[simpleStruct.condition2.id]) result = false;
 			});
 			//condition1にある全てはcondition1を満たす
 			simpleStruct.condition1Elem.forEach(function(e){
-				if(!targets.find(n => n.id == e.id).condition[simpleStruct.condition1.id]) return false;
+				if(!targets.find(n => n.id == e.id).condition[simpleStruct.condition1.id]) result = false;
+			});
+			//condition1にある全てはcondition2を満たさない
+			simpleStruct.condition1Elem.forEach(function(e){
+				if(targets.find(n => n.id == e.id).condition[simpleStruct.condition2.id]) result = false;
 			});
 			//condition2にある全てはcondition2を満たす
 			simpleStruct.condition2Elem.forEach(function(e){
-				if(!targets.find(n => n.id == e.id).condition[simpleStruct.condition2.id]) return false;
+				if(!targets.find(n => n.id == e.id).condition[simpleStruct.condition2.id]) result = false;
+			});
+			//condition2にある全てはcondition1を満たさない
+			simpleStruct.condition2Elem.forEach(function(e){
+				if(!targets.find(n => n.id == e.id).condition[simpleStruct.condition1.id]) result = false;
 			});
 			//そこに入らないもの全ては両方満たさない
 			for(var i = 0; i < targets.length; i++)
 			{
 				if(simpleStruct.condition2Elem.filter(x => x.id == i).length == 0 && simpleStruct.condition1Elem.filter(x => x.id == i).length == 0 && simpleStruct.both.filter(x => x.id == i).length == 0)
 				{
-					if(targets.find(n => n.id == i).condition[simpleStruct.condition2.id] || targets.find(n => n.id == i).condition[simpleStruct.condition1.id]) return false;
+					if(targets.find(n => n.id == i).condition[simpleStruct.condition2.id] || targets.find(n => n.id == i).condition[simpleStruct.condition1.id]) result = false;
 				}
 			}
+
+			return result;
 
 		}else {
 			return false;
 		}
-
-		return true;
 }
 
 function getSimpleStructData(obj)
