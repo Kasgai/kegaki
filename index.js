@@ -458,7 +458,7 @@ function hantei(){
 			});
 			//condition2にある全てはcondition1を満たさない
 			simpleStruct.condition2Elem.forEach(function(e){
-				if(!targets.find(n => n.id == e.id).condition[simpleStruct.condition1.id]) result = false;
+				if(targets.find(n => n.id == e.id).condition[simpleStruct.condition1.id]) result = false;
 			});
 			//そこに入らないもの全ては両方満たさない
 			for(var i = 0; i < targets.length; i++)
